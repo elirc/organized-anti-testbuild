@@ -1,0 +1,149 @@
+export enum UserRole {
+  PLATFORM_ADMIN = 'PLATFORM_ADMIN',
+  INTERNAL_OPS = 'INTERNAL_OPS',
+  CLIENT_ADMIN = 'CLIENT_ADMIN',
+  CLIENT_HR = 'CLIENT_HR',
+  WORKER = 'WORKER'
+}
+
+export enum TenantStatus {
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED'
+}
+
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
+}
+
+export enum CompanyStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
+}
+
+export enum EmploymentStatus {
+  DRAFT = 'DRAFT',
+  ONBOARDING = 'ONBOARDING',
+  ACTIVE = 'ACTIVE',
+  PAUSED = 'PAUSED',
+  TERMINATED = 'TERMINATED'
+}
+
+export enum RequirementType {
+  DOCUMENT = 'DOCUMENT',
+  APPROVAL = 'APPROVAL',
+  POLICY_ACKNOWLEDGEMENT = 'POLICY_ACKNOWLEDGEMENT',
+  RIGHT_TO_WORK = 'RIGHT_TO_WORK'
+}
+
+export enum ContractType {
+  FULL_TIME = 'FULL_TIME',
+  PART_TIME = 'PART_TIME',
+  FIXED_TERM = 'FIXED_TERM',
+  CONTRACTOR = 'CONTRACTOR'
+}
+
+export enum ContractStatus {
+  DRAFT = 'DRAFT',
+  IN_REVIEW = 'IN_REVIEW',
+  APPROVED = 'APPROVED',
+  SENT = 'SENT',
+  SIGNED = 'SIGNED',
+  ACTIVE = 'ACTIVE',
+  TERMINATED = 'TERMINATED'
+}
+
+export enum OnboardingStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  BLOCKED = 'BLOCKED',
+  COMPLETED = 'COMPLETED'
+}
+
+export enum OnboardingTaskType {
+  PROFILE_INFO = 'PROFILE_INFO',
+  DOCUMENT_UPLOAD = 'DOCUMENT_UPLOAD',
+  POLICY_ACK = 'POLICY_ACK',
+  INTERNAL_REVIEW = 'INTERNAL_REVIEW',
+  CONTRACT_SIGNATURE = 'CONTRACT_SIGNATURE'
+}
+
+export enum OnboardingTaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  BLOCKED = 'BLOCKED',
+  DONE = 'DONE'
+}
+
+export enum DocumentType {
+  PASSPORT = 'PASSPORT',
+  TAX_FORM = 'TAX_FORM',
+  CONTRACT = 'CONTRACT',
+  RIGHT_TO_WORK = 'RIGHT_TO_WORK',
+  BANK_INFO = 'BANK_INFO',
+  OTHER = 'OTHER'
+}
+
+export enum DocumentStatus {
+  PENDING_REVIEW = 'PENDING_REVIEW',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED'
+}
+
+export enum PayrollCycleStatus {
+  DRAFT = 'DRAFT',
+  COLLECTING_INPUTS = 'COLLECTING_INPUTS',
+  REVIEW = 'REVIEW',
+  APPROVED = 'APPROVED',
+  PAID = 'PAID',
+  CLOSED = 'CLOSED'
+}
+
+export enum PayrollItemStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  HELD = 'HELD',
+  PAID = 'PAID'
+}
+
+export enum BenefitType {
+  HEALTH = 'HEALTH',
+  DENTAL = 'DENTAL',
+  VISION = 'VISION',
+  RETIREMENT = 'RETIREMENT',
+  LIFE_INSURANCE = 'LIFE_INSURANCE',
+  OTHER = 'OTHER'
+}
+
+export enum BenefitStatus {
+  NOT_ELIGIBLE = 'NOT_ELIGIBLE',
+  ELIGIBLE = 'ELIGIBLE',
+  ENROLLED = 'ENROLLED',
+  WAIVED = 'WAIVED',
+  TERMINATED = 'TERMINATED'
+}
+
+export enum SupportCategory {
+  ONBOARDING = 'ONBOARDING',
+  PAYROLL = 'PAYROLL',
+  BENEFITS = 'BENEFITS',
+  CONTRACT = 'CONTRACT',
+  DOCUMENTS = 'DOCUMENTS',
+  GENERAL = 'GENERAL'
+}
+
+export enum SupportPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT'
+}
+
+export enum SupportStatus {
+  OPEN = 'OPEN',
+  IN_PROGRESS = 'IN_PROGRESS',
+  WAITING_ON_CLIENT = 'WAITING_ON_CLIENT',
+  WAITING_ON_WORKER = 'WAITING_ON_WORKER',
+  RESOLVED = 'RESOLVED',
+  CLOSED = 'CLOSED'
+}
