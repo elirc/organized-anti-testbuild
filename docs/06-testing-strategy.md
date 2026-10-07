@@ -1,44 +1,73 @@
 # Testing Strategy - GlobalWorkforce OS
 
-GlobalWorkforce OS includes a comprehensive test framework comprising backend business logic unit tests, multi-tenant integration boundary tests, frontend schema validation unit tests, and Playwright end-to-end user workflows.
+> Snapshot note: this repo is an organized snapshot of `elirc/antitestbuild`; its code and docs matched that repo, so the doc refinements made there are carried over here.
+
+**The honest starting point: this repository contains no test files today.** The
+scripts exist (`npm run test:api` runs `vitest run` in `apps/api`), but Vitest
+will report "no test files found". What follows is the strategy this codebase
+*needs*, ordered by payoff, with the first concrete targets named — treat it as
+the build plan, not a description of what exists.
 
 ---
 
-## Test Organization
+## 1. First target: the contract state machine (pure logic, no infra)
 
-### 1. Backend Testing (`apps/api`)
-Powered by **Vitest** for quick execution:
-* **Unit Tests**: Test core services in isolation (e.g. validating contract transition states, date rules, or tax task generation algorithms).
-* **Integration Tests**: Connect to a PostgreSQL test instance, executing actual database queries:
-  * **Auth Flow**: Success/failure handshakes.
-  * **Tenant isolation**: Verifies queries by one tenant user strictly reject/fail when attempting to fetch another tenant's workforce data.
-  * **Audit logging**: Verifies that making modifications to companies, workers, and cases immediately commits structural audit logs.
+`apps/api/src/modules/contracts/contracts.service.ts:19-27` holds
+`validTransitions` — DRAFT → IN_REVIEW → APPROVED → SENT → SIGNED → ACTIVE →
+TERMINATED, with rejection paths back to DRAFT and TERMINATED as the terminal
+state. It is currently a `private readonly` field inside the service class, so
+the very first test forces the right refactor: extract the matrix and a
+`canTransition(from, to)` helper into its own file so it can be imported
+without instantiating the service (which needs `PrismaService` and
+`AuditLogService`).
 
-### 2. Frontend Testing (`apps/web`)
-* **Form validation**: Unit test logins and worker creation form checks.
-* **Component isolation**: Verify that reusable components like Table, Badge, and protected guards handle loaded, empty, and rejected states cleanly.
+**Check**: a `contracts.transitions.spec.ts` asserting SENT → SIGNED is
+allowed, DRAFT → ACTIVE is rejected, and TERMINATED allows nothing, passing
+under `npm run test:api` — and the service behaves identically (the error
+message in `update()` still lists the allowed transitions).
 
-### 3. End-to-End (E2E) Testing
-Managed via **Playwright** simulating full operational cycles:
-1. Logs in as `ops@example.com` (Internal Ops).
-2. Spasms a client Company and adds a Worker profile.
-3. Generates a new onboarding plan and default tasks.
-4. Uploads document metadata as the Worker, and approves it as Ops.
-5. Verifies the dashboard active worker count increases by 1.
+## 2. Second target: tenant isolation (the test that earns its keep)
+
+`apps/api/src/common/guards/tenant.guard.ts` is the whole multi-tenant story:
+CLIENT/WORKER users get `request.tenantId` bound from their token and a
+`ForbiddenException` if they name any other tenant in params, query, body or
+the `x-tenant-id` header; PLATFORM_ADMIN and INTERNAL_OPS bypass with
+`request.isCrossTenant = true`. The guard is a plain class with no decorator
+magic in the way — construct it directly, feed it a mocked
+`ExecutionContext`, and pin all five behaviours (no user → 403; client with
+matching tenant → bound; client naming a foreign tenant → 403; ops with
+header → cross-tenant bound; client without tenantId → 403).
+
+**Check**: five green assertions, and deliberately breaking the mismatch
+comparison on line 51 turns exactly one of them red.
+
+## 3. Integration tests (requires Postgres — document the cost)
+
+The valuable cases, in order: auth handshake success/failure; tenant isolation
+enforced *at the query level* (services must filter `where: { tenantId }` —
+the guard binds it, but nothing forces a service to use it, which is exactly
+what an integration test should catch); audit log rows written on company,
+worker and case mutations (`audit-log.service.ts`). These need a real
+PostgreSQL instance and seeded tenants; on this project that is a
+`docker-compose.yml` database plus `npm run prisma:seed`.
+
+## 4. End-to-end (aspirational — write it last)
+
+One Playwright workflow covers the product's spine: log in as the seeded ops
+user, create a company and worker, generate an onboarding plan, upload a
+document as the worker, approve it as ops, and watch the dashboard's active
+worker count increase. Build this only after layers 1-3 exist; an E2E suite
+on top of zero unit tests inverts the maintenance cost.
 
 ---
 
-## Running the Tests
-
-To run the testing sweeps, use the standard monorepo scripts:
+## Running the tests
 
 ```bash
-# Run backend test suites
-npm run test:api
-
-# Watch mode backend tests
-npm run test --workspace=apps/api
-
-# Run frontend unit tests
-npm run test:web
+npm run test:api                   # vitest in apps/api (empty today)
+npm run test --workspace=apps/api  # same, watch mode via test:watch
+npm run test:web                   # vitest in apps/web (empty today)
 ```
+
+The first PR that makes `npm run test:api` print a non-zero test count is the
+most valuable PR a learner can make to this repository.
